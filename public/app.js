@@ -7,16 +7,65 @@ $.getJSON("/articles", function (data) {
     <a target=_blank href= ${data[i].link}><img src = ${data[i].img} width =30%></a>
     <br/>${data[i].title}
     <button class = addComment type=input id=${data[i]._id} >Add comment </button>
-    <button data-target="modal1" class="btn modal-trigger">Modal</button>
+    <a class="waves-effect waves-light btn darken-1 modal-trigger" id=${data[i]._id} href="#demo-modal">Add comment</a>
     </p>`);
   }
 });
+$(document).ready(function () {
+  // $(document).on("click",".modal-trigger",function(event){ 
+  // $(".modal-trigger").on("click",function(event){
+  //    $(".modal").empty();
 
+  $('.modal').modal({
+    dismissible: true, // Modal can be dismissed by clicking outside of the modal
+    onOpenEnd: function (modal, trigger) {
+      console.log('event', event) // Callback for Modal open. Modal and trigger parameters available.
+      $(".modal").empty();
+      console.log(modal, trigger);
+      let thisId = trigger.id;
+      $.ajax({
+          method: "GET",
+          url: "/articles/" + thisId
+        })
+        // With that done, add the note information to the page
+        .then(function (data) {
 
-$(document).on("click", ".modal-trigger", function (event) {
-  $('.modal').modal();
+          // $(".modal").append(`<h2>${data.title}</h1>`);
+
+          $(".modal").append("<h6>" + data.title + "</h6>");
+          // An input to enter a new title
+
+          $(".modal").append(`  <div class="row">
+  <form class="col s12">
+    <div class="row">
+      <div class="input-field col s12">
+        <textarea id="textarea1" class="materialize-textarea"></textarea>
+        <label for="textarea1">Enter your comments</label>
+      </div>
+    </div>
+  </form>
+</div>`)
+          // $(".modal").append("Name : <input id='titleinput' name='title'></input>");
+          // A textarea to add a new note body
+          // $(".modal").append("Enter the Notes : <textarea id='bodyinput' name='body'></textarea>");
+          // A button to submit a new note, with the id of the article saved to it
+          $(".modal").append(`<button class= "waves-effect waves-light btn" data-id=${data._id} id='savenote'>Save Note</button>`);
+
+          // If there's a note in the article
+          if (data.note) {
+            // Place the title of the note in the title input
+            $("#titleinput").val(data.note.title);
+            // Place the body of the note in the body textarea
+            $("#bodyinput").val(data.note.body);
+          }
+
+          $(".modal").append(`<a class="waves-effect pink waves-light btn">Close</a>`)
+
+        });
+    }
+  })
 });
-
+// })
 // Whenever someone clicks a p tag
 $(document).on("click", ".addComment", function (event) {
   // 
@@ -105,6 +154,6 @@ $(document).on("click", "#scrape", async function () {
       url: "/scrape"
     })
     .then(async function (data) {
-     await location.reload(true);
+      await location.reload(true);
     })
 });
