@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 
 const app = express();
-const mongoURI='mongodb://localhost/testdb'
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/testdb'
 
 mongoose.connect(mongoURI, { useNewUrlParser: true });
 const PORT = process.env.PORT || 3001;
